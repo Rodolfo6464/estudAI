@@ -1,0 +1,281 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EstudaAí</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: caderno quadriculado — uma coluna estreita, etapas como abas de fichário */
+:root{
+  --bg:#f3f5f9; --paper:#ffffff; --grid:#e3e8f2; --ink:#18213a; --muted:#5b6682;
+  --accent:#2347c9; --accent-ink:#ffffff; --mark:#ffe36e; --ok:#1d7a4a; --ok-bg:#e2f4ea; --bad:#b3261e; --bad-bg:#fbe7e5; --line:#d5dbe8;
+  --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1422; --paper:#171e30; --grid:#1d2539; --ink:#e7ebf5; --muted:#9aa5c2;
+  --accent:#7d9bff; --accent-ink:#0f1422; --mark:#6b5a12; --ok:#6fd39c; --ok-bg:#16302a; --bad:#ff8a80; --bad-bg:#3a1c1c; --line:#2a3350; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1422; --paper:#171e30; --grid:#1d2539; --ink:#e7ebf5; --muted:#9aa5c2;
+  --accent:#7d9bff; --accent-ink:#0f1422; --mark:#6b5a12; --ok:#6fd39c; --ok-bg:#16302a; --bad:#ff8a80; --bad-bg:#3a1c1c; --line:#2a3350; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 96px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(2rem,6vw,2.8rem);margin:0;letter-spacing:-.02em;line-height:1.05}
+header h1 span{background:linear-gradient(transparent 58%,var(--mark) 58%)}
+header p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+h2{font-family:var(--display);font-weight:600;font-size:1.3rem;margin:0;text-wrap:balance}
+label{font-weight:700;font-size:.9rem}
+.field{display:flex;flex-direction:column;gap:6px}
+input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+textarea{min-height:190px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hint{font-size:.85rem;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:inherit;font-weight:700;border-radius:999px;padding:10px 18px;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.loading{display:flex;gap:10px;align-items:center;color:var(--muted)}
+.spin{width:18px;height:18px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:r 0.8s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:3s}}
+.prose p{margin:0 0 .7em}.prose ul{margin:0 0 .7em;padding-left:1.3em}.prose h3{font-family:var(--display);font-size:1.08rem;margin:.9em 0 .3em}
+.prose mark,.prose strong{background:linear-gradient(transparent 60%,var(--mark) 60%);color:inherit;font-weight:700}
+.q{border-top:1px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.q:first-of-type{border-top:0;padding-top:0}
+.qn{font-family:var(--display);font-weight:600;color:var(--accent);font-size:.85rem;letter-spacing:.06em;text-transform:uppercase}
+.qt{font-weight:700}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.opt input{width:auto;margin-top:4px}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.fb{font-size:.92rem;padding:10px 12px;border-radius:10px;background:var(--bg)}
+.fb b.ok{color:var(--ok)} .fb b.bad{color:var(--bad)}
+.score{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.score .n{font-family:var(--display);font-weight:800;font-size:3rem;line-height:1;font-variant-numeric:tabular-nums}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:10px;padding:10px 12px;font-size:.92rem}
+.notice{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--paper);font-size:.85rem;text-align:center;
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--mark);color:var(--ink);padding:2px 8px;border-radius:6px}
+</style>
+
+</head><body>
+<div class="wrap">
+  <header>
+    <h1>Estuda<span>Aí</span></h1>
+    <p>Cole o conteúdo da aula. A IA explica de um jeito simples, cria um quiz só com base nesse texto e corrige suas respostas mostrando o que revisar.</p>
+  </header>
+
+  <section class="card" aria-labelledby="t1">
+    <h2 id="t1">1. Conteúdo da aula</h2>
+    <div class="field">
+      <label for="disc">Disciplina (opcional)</label>
+      <input id="disc" placeholder="Ex.: Biologia Celular">
+    </div>
+    <div class="field">
+      <label for="conteudo">Texto, resumo ou slides copiados</label>
+      <textarea id="conteudo"></textarea>
+      <span class="hint" id="exemploHint"><span class="tag">Exemplo</span> Já deixamos um trecho de exemplo. Apague e cole o da sua aula.</span>
+    </div>
+    <div class="row">
+      <button id="bExplicar">Explicar</button>
+      <button id="bQuiz" class="ghost">Gerar quiz</button>
+    </div>
+    <div id="indisp" class="err" hidden></div>
+  </section>
+
+  <section class="card" id="cExp" hidden aria-labelledby="t2">
+    <h2 id="t2">2. Explicação</h2>
+    <div id="exp" class="prose"></div>
+  </section>
+
+  <section class="card" id="cQuiz" hidden aria-labelledby="t3">
+    <h2 id="t3">3. Quiz</h2>
+    <div id="quiz" style="display:flex;flex-direction:column;gap:14px"></div>
+    <div class="row" id="quizBtns" hidden>
+      <button id="bCorrigir">Corrigir</button>
+      <button id="bNovo" class="ghost">Novo quiz</button>
+    </div>
+  </section>
+
+  <section class="card" id="cRes" hidden aria-labelledby="t4">
+    <h2 id="t4">4. Resultado</h2>
+    <div id="res"></div>
+  </section>
+</div>
+<div class="notice">A IA pode cometer erros; confira sempre com o material da disciplina.</div>
+
+<script>
+const EXEMPLO = `Fotossíntese é o processo pelo qual plantas, algas e algumas bactérias convertem energia luminosa em energia química. Ocorre nos cloroplastos, organelas que contêm clorofila, o pigmento que absorve principalmente luz azul e vermelha.
+
+O processo tem duas etapas. Na fase clara, que acontece nas membranas dos tilacoides, a luz quebra moléculas de água (fotólise), liberando oxigênio e produzindo ATP e NADPH. Na fase escura, ou Ciclo de Calvin, que ocorre no estroma, o CO2 do ar é fixado com a ajuda da enzima RuBisCO e, usando o ATP e o NADPH, forma glicose.
+
+Equação geral: 6 CO2 + 6 H2O + luz → C6H12O6 + 6 O2. Fatores que limitam a fotossíntese incluem intensidade luminosa, concentração de CO2 e temperatura.`;
+
+const $ = id => document.getElementById(id);
+$('conteudo').value = EXEMPLO;
+$('conteudo').addEventListener('input', () => { $('exemploHint').hidden = $('conteudo').value === EXEMPLO ? false : true; });
+
+let quiz = [], historico = [];
+// ============================================================
+// CONFIGURAÇÃO: cole sua chave do Groq entre as aspas abaixo.
+const CHAVE_GROQ = "COLE_SUA_CHAVE_AQUI";
+// ============================================================
+const temChaveFixa = CHAVE_GROQ && CHAVE_GROQ.startsWith('gsk_');
+const MODELOS = ['llama-3.3-70b-versatile','openai/gpt-oss-120b','llama-3.1-8b-instant'];
+async function sample(prompt, opts={}){
+  const key = temChaveFixa ? CHAVE_GROQ.trim() : '';
+  if (!key){ const e=new Error('sem chave'); e.code='no_key'; throw e; }
+  let ultimo;
+  for (const modelo of MODELOS){
+    const body = { model: modelo, temperature: opts.json?0.7:0.5,
+      messages:[{role:'system',content:'Você é o EstudaAí, um tutor de estudos para universitários. Responda sempre em português do Brasil.'},{role:'user',content:prompt}] };
+    if (opts.json) body.response_format = {type:'json_object'};
+    let r;
+    try{
+      r = await fetch('https://api.groq.com/openai/v1/chat/completions',
+        {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
+    }catch(e){ const x=new Error('rede'); x.code='network'; throw x; }
+    const d = await r.json().catch(()=>({}));
+    if (r.ok){
+      const text = d.choices?.[0]?.message?.content || '';
+      if (!text){ const x=new Error('vazio'); x.code='empty'; throw x; }
+      return {text};
+    }
+    const detalhe = d.error?.message || '';
+    const x = new Error(`HTTP ${r.status}: ${detalhe}`);
+    x.code = r.status===429?'rate_limited':(r.status===401||r.status===403)?'bad_key':'http';
+    ultimo = x;
+    const modeloRuim = r.status===404 || /model/i.test(detalhe) && /(not exist|decommission|not found|does not)/i.test(detalhe);
+    if (!modeloRuim) throw x;   // modelo indisponível: tenta o próximo
+  }
+  throw ultimo;
+}
+const ready = Promise.resolve(sample);
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function md(t){
+  const lines = esc(t).split('\n'); let out='', inList=false;
+  const inline = s => s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
+  for (const raw of lines){
+    const l = raw.trim();
+    if (/^[-*•]\s+/.test(l)){ if(!inList){out+='<ul>';inList=true;} out+='<li>'+inline(l.replace(/^[-*•]\s+/,''))+'</li>'; continue; }
+    if (inList){out+='</ul>';inList=false;}
+    if (/^#{1,6}\s+/.test(l)) out+='<h3>'+inline(l.replace(/^#{1,6}\s+/,''))+'</h3>';
+    else if (l) out+='<p>'+inline(l)+'</p>';
+  }
+  if (inList) out+='</ul>'; return out;
+}
+function loading(el,msg){el.innerHTML=`<div class="loading"><div class="spin" aria-hidden="true"></div><span>${msg}</span></div>`;}
+function erro(el,msg){el.innerHTML=`<div class="err">${esc(msg)}</div>`;}
+function getInput(){
+  const c = $('conteudo').value.trim();
+  if (c.length < 80){ alertBox('Cole um conteúdo um pouco maior (pelo menos um parágrafo) para a IA trabalhar.'); return null; }
+  return { c: c.slice(0, 20000), d: $('disc').value.trim() };
+}
+function alertBox(msg){ const el=$('indisp'); el.textContent=msg; el.hidden=false; setTimeout(()=>{el.hidden=true;},5000); }
+function msgErro(e){
+  if (e && e.code==='rate_limited') return 'Muitas solicitações seguidas. Espere um minuto e tente de novo.';
+  if (e && e.code==='no_key') return 'O serviço de IA não está configurado neste arquivo.';
+  if (e && e.code==='bad_key') return 'O serviço de IA recusou o acesso (' + (e.message||'') + ').';
+  if (e && e.code==='network') return 'Sem conexão com a internet ou com o Groq. Verifique a rede e tente de novo.';
+  return 'Não foi possível falar com a IA agora.' + (e && e.message ? ' Detalhe técnico: ' + e.message : '');
+}
+function busy(b){ ['bExplicar','bQuiz','bCorrigir','bNovo'].forEach(id=>$(id).disabled=b); }
+
+$('bExplicar').onclick = async () => {
+  const inp = getInput(); if (!inp) return; 
+  $('cExp').hidden=false; loading($('exp'),'Preparando a explicação…'); busy(true);
+  const prompt = `Você é um tutor universitário paciente. Explique o conteúdo abaixo${inp.d?` da disciplina "${inp.d}"`:''} para um estudante, em português do Brasil.
+Regras: linguagem simples; comece com uma frase-resumo; depois os conceitos principais em tópicos curtos; inclua 2 exemplos do dia a dia; termine com "Para fixar:" e 3 pontos-chave. Use **negrito** nos termos importantes. Baseie-se SOMENTE no conteúdo fornecido; se algo não estiver no texto, não invente.
+
+CONTEÚDO:
+"""${inp.c}"""`;
+  try{
+    const r = await sample(prompt,{onText:({text})=>{ $('exp').innerHTML = md(text); }});
+    $('exp').innerHTML = md(r.text);
+  }catch(e){ erro($('exp'), msgErro(e)); }
+  busy(false);
+};
+
+function extrairJSON(t){
+  t = t.replace(/```(?:json)?/gi,'').trim();
+  const a = t.indexOf('['), b = t.lastIndexOf(']');
+  const a2 = t.indexOf('{');
+  let obj;
+  if (a2 !== -1 && (a === -1 || a2 < a)) obj = JSON.parse(t.slice(a2, t.lastIndexOf('}')+1));
+  else obj = JSON.parse(t.slice(a, b+1));
+  const arr = Array.isArray(obj) ? obj : obj.questoes;
+  if (!Array.isArray(arr) || !arr.length) throw new Error('formato');
+  return arr.slice(0,5).map(q=>{
+    if (typeof q.pergunta!=='string' || !Array.isArray(q.alternativas) || q.alternativas.length!==4) throw new Error('formato');
+    const c = Number(q.correta); if (!(c>=0 && c<=3)) throw new Error('formato');
+    return {pergunta:q.pergunta, alternativas:q.alternativas.map(String), correta:c, explicacao:String(q.explicacao||'')};
+  });
+}
+
+async function gerarQuiz(){
+  const inp = getInput(); if (!inp) return; 
+  $('cQuiz').hidden=false; $('cRes').hidden=true; $('quizBtns').hidden=true; loading($('quiz'),'Criando 5 questões…'); busy(true);
+  const evitar = historico.length ? `\nNão repita estas perguntas já feitas: ${historico.map(p=>`"${p}"`).join('; ')}.` : '';
+  const prompt = `Crie um quiz de 5 questões de múltipla escolha, em português do Brasil, baseado SOMENTE no conteúdo abaixo. Cada questão tem exatamente 4 alternativas e apenas uma correta. Varie a posição da correta. Alternativas erradas devem ser plausíveis.${evitar}
+Responda APENAS com JSON válido, sem texto antes ou depois, neste formato:
+{"questoes":[{"pergunta":"...","alternativas":["A","B","C","D"],"correta":0,"explicacao":"por que a correta está certa, citando o conteúdo"}]}
+"correta" é o índice (0 a 3) da alternativa certa.
+
+CONTEÚDO:
+"""${inp.c}"""`;
+  let ok=false;
+  for (let tent=0; tent<2 && !ok; tent++){
+    try{
+      const r = await sample(prompt,{json:true});
+      quiz = extrairJSON(r.text); ok = true;
+    }catch(e){
+      if (e && e.code && e.code!=='empty'){ erro($('quiz'), msgErro(e)); busy(false); return; }
+    }
+  }
+  if (!ok){ erro($('quiz'),'A IA devolveu o quiz num formato inválido duas vezes. Clique em "Gerar quiz" para tentar de novo.'); busy(false); return; }
+  historico.push(...quiz.map(q=>q.pergunta));
+  $('quiz').innerHTML = quiz.map((q,i)=>`<div class="q" id="q${i}">
+      <span class="qn">Questão ${i+1}</span><div class="qt">${esc(q.pergunta)}</div>
+      ${q.alternativas.map((a,j)=>`<label class="opt" id="o${i}_${j}"><input type="radio" name="r${i}" id="r${i}_${j}" value="${j}"><span>${'ABCD'[j]}) ${esc(a)}</span></label>`).join('')}
+      <div class="fb" id="fb${i}" hidden></div></div>`).join('');
+  $('quizBtns').hidden=false; busy(false);
+}
+$('bQuiz').onclick = gerarQuiz;
+$('bNovo').onclick = gerarQuiz;
+
+$('bCorrigir').onclick = async () => {
+  const resp = quiz.map((_,i)=>{const s=document.querySelector(`input[name="r${i}"]:checked`);return s?Number(s.value):null;});
+  if (resp.includes(null)){ alertBox('Responda todas as 5 questões antes de corrigir.'); return; }
+  let acertos=0; const erros=[];
+  quiz.forEach((q,i)=>{
+    const certa = resp[i]===q.correta; if(certa) acertos++; else erros.push(i);
+    $(`o${i}_${q.correta}`).classList.add('right');
+    if(!certa) $(`o${i}_${resp[i]}`).classList.add('wrong');
+    document.querySelectorAll(`input[name="r${i}"]`).forEach(x=>x.disabled=true);
+    const fb=$(`fb${i}`); fb.hidden=false;
+    fb.innerHTML = certa ? `<b class="ok">Acertou.</b> ${esc(q.explicacao)}` : `<b class="bad">Resposta certa: ${'ABCD'[q.correta]}.</b> ${esc(q.explicacao)}`;
+  });
+  $('cRes').hidden=false; $('bCorrigir').disabled=true;
+  const head = `<div class="score"><span class="n">${acertos}/5</span><span>${acertos===5?'Excelente, você dominou este conteúdo.':acertos>=3?'Bom resultado. Revise os pontos abaixo.':'Vale revisar o conteúdo antes da prova.'}</span></div>`;
+  if (!erros.length){ $('res').innerHTML = head; return; }
+  $('res').innerHTML = head + '<div id="rev"></div>'; loading($('rev'),'Montando o que revisar…');
+  
+  const detalhes = erros.map(i=>`- Pergunta: ${quiz[i].pergunta}\n  Resposta do aluno: ${quiz[i].alternativas[resp[i]]}\n  Correta: ${quiz[i].alternativas[quiz[i].correta]}`).join('\n');
+  const prompt = `Um estudante errou estas questões de um quiz sobre o conteúdo abaixo:
+${detalhes}
+
+Em português do Brasil, escreva:
+1. Para cada erro, uma frase explicando a confusão provável do aluno.
+2. Uma seção "### O que revisar" com 2 a 4 tópicos curtos do conteúdo que ele deve estudar de novo.
+Seja encorajador e baseie-se SOMENTE no conteúdo.
+
+CONTEÚDO:
+"""${$('conteudo').value.trim().slice(0,20000)}"""`;
+  try{ const r = await sample(prompt,{onText:({text})=>{$('rev').innerHTML='<div class="prose">'+md(text)+'</div>';}}); $('rev').innerHTML='<div class="prose">'+md(r.text)+'</div>'; }
+  catch(e){ erro($('rev'), msgErro(e)); }
+};
+$('bQuiz').addEventListener('click',()=>{$('bCorrigir').disabled=false;});
+$('bNovo').addEventListener('click',()=>{$('bCorrigir').disabled=false;});
+</script>
+
+</body></html>
